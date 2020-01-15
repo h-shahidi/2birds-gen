@@ -14,22 +14,22 @@ The [WikiBio](https://github.com/DavidGrangier/wikipedia-biography-dataset) data
 
 # Preprocess
 Run the following command:
-'''
+```
 python preprocess.py
-'''
+```
 
 After preprocessing, `processed_data` would be created. This directory contains `*.box.pos`, `*.box.rpos`, `*.box.val`, and `*.box.lab` that represent the word position p+, p-, field content and field types, respectively.
 
 # Train
 Run the following command for traing:
-'''
+```
 python main.py --mode=train
-'''
+```
 
 If you want to train the model using reinforcement learning run the following command:
-'''
+```
 python main.py --mode=train --loss=rl
-'''
+```
 
 Experimental results will be saved at `results/res`.
 
