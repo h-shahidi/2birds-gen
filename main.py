@@ -238,11 +238,7 @@ def main(_):
     with tf.Session(config=config) as sess:
         copy_file(save_file_dir)
         dataloader = DataLoader(FLAGS.dir)
-        model = SeqUnit(batch_size=FLAGS.batch_size, hidden_size=FLAGS.hidden_size, emb_size=FLAGS.emb_size,
-                        field_size=FLAGS.field_size, pos_size=FLAGS.pos_size, field_vocab=FLAGS.field_vocab,
-                        source_vocab=FLAGS.source_vocab, position_vocab=FLAGS.position_vocab,
-                        target_vocab=FLAGS.target_vocab, scope_name="seq2seq", name="seq2seq", is_training=is_training,
-                        learning_rate=FLAGS.learning_rate, loss=FLAGS.loss)
+        model = SeqUnit(FLAGS, scope_name="seq2seq", is_training=is_training)
         sess.run(tf.global_variables_initializer())
         if FLAGS.load != '0':
             tvars = tf.trainable_variables()

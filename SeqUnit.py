@@ -16,29 +16,26 @@ import rouge
 BETA = 0.017
 
 class SeqUnit(object):
-    def __init__(self, batch_size, hidden_size, emb_size, field_size, pos_size, source_vocab, field_vocab,
-                 position_vocab, target_vocab, learning_rate, scope_name, name, is_training, loss, start_token=2, 
-                 stop_token=2, max_length=150):
+    def __init__(self, FLAGS, scope_name, is_training, start_token=2, stop_token=2, max_length=150):
         '''
         batch_size, hidden_size, emb_size, field_size, pos_size: size of batch; hidden layer; word/field/position embedding
         source_vocab, target_vocab, field_vocab, position_vocab: vocabulary size of encoder words; decoder words; field types; position
         '''
-        self.batch_size = batch_size
-        self.hidden_size = hidden_size
-        self.emb_size = emb_size
-        self.field_size = field_size
-        self.pos_size = pos_size
-        self.uni_size = emb_size + field_size + 2 * pos_size
-        self.source_vocab = source_vocab
-        self.target_vocab = target_vocab
-        self.field_vocab = field_vocab
-        self.position_vocab = position_vocab
+        self.batch_size = FLAGS.batch_size
+        self.hidden_size = FLAGS.hidden_size
+        self.emb_size = FLAGS.emb_size
+        self.field_size = FLAGS.field_size
+        self.pos_size = FLAGS.pos_size
+        self.uni_size = FLAGS.emb_size + FLAGS.field_size + 2 * FLAGS.pos_size
+        self.source_vocab = FLAGS.source_vocab
+        self.target_vocab = FLAGS.target_vocab
+        self.field_vocab = FLAGS.field_vocab
+        self.position_vocab = FLAGS.position_vocab
         self.grad_clip = 5.0
         self.start_token = start_token
         self.stop_token = stop_token
         self.max_length = max_length
         self.scope_name = scope_name
-        self.name = name
         self.n_iter = 0
         self.baseline = 0
 
@@ -63,14 +60,14 @@ class SeqUnit(object):
         self.copy_mech = copy_mech(self.emb_size, self.hidden_size)
 
         with tf.variable_scope("context_concat"):
-            self.Wc = tf.get_variable('Wc', [2*hidden_size+emb_size, hidden_size])
-            self.bc = tf.get_variable('bc', [hidden_size])
+            self.Wc = tf.get_variable('Wc', [2 * self.hidden_size + self.emb_size, self.hidden_size])
+            self.bc = tf.get_variable('bc', [self.hidden_size])
 
         with tf.variable_scope("decoder_init"):
-            self.W_init_h = tf.get_variable('W_init_h', [2*hidden_size, hidden_size])
-            self.b_init_h = tf.get_variable('b_init_h', [hidden_size])
-            self.W_init_c = tf.get_variable('W_init_c', [2*hidden_size, hidden_size])
-            self.b_init_c = tf.get_variable('b_init_c', [hidden_size])
+            self.W_init_h = tf.get_variable('W_init_h', [2 * self.hidden_size, self.hidden_size])
+            self.b_init_h = tf.get_variable('b_init_h', [self.hidden_size])
+            self.W_init_c = tf.get_variable('W_init_c', [2 * self.hidden_size, self.hidden_size])
+            self.b_init_c = tf.get_variable('b_init_c', [self.hidden_size])
 
         self.params.update({'Wc': self.Wc, 'bc': self.bc, 
                             'W_init_h': self.W_init_h, 'b_init_h': self.b_init_h, 'W_init_c': self.W_init_c, 'b_init_c': self.b_init_c})
@@ -138,7 +135,7 @@ class SeqUnit(object):
         self.g_tokens = tf.arg_max(g_outputs, 2)
 
         mask = tf.sign(tf.to_float(self.decoder_output))
-        if loss == 'ce':
+        if FLAGS.loss == 'ce':
             losses = self.CE_loss(de_outputs, self.decoder_output, mask)
             self.mean_loss = tf.reduce_mean(losses)
         else:
@@ -149,7 +146,7 @@ class SeqUnit(object):
 
         tvars = tf.trainable_variables()
         grads, _ = tf.clip_by_global_norm(tf.gradients(self.mean_loss, tvars), self.grad_clip)
-        optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
+        optimizer = tf.train.AdamOptimizer(learning_rate=FLAGS.learning_rate)
         opt_op = optimizer.apply_gradients(zip(grads, tvars))
         ema = tf.train.ExponentialMovingAverage(decay=0.9999)
         self.ema = ema
@@ -351,13 +348,13 @@ class SeqUnit(object):
         param_values = {}
         for param in self.params:
             param_values[param] = self.params[param].eval()
-        with open(path+self.name+".pkl", 'wb') as f:
+        with open(path+self.scope_name+".pkl", 'wb') as f:
             pickle.dump(param_values, f, True)
 
     def load(self, path):
         for u in self.units:
             self.units[u].load(path+u+".pkl")
-        param_values = pickle.load(open(path+self.name+".pkl", 'rb'))
+        param_values = pickle.load(open(path+self.scope_name+".pkl", 'rb'))
         for param in param_values:
             self.params[param].load(param_values[param])
 
