@@ -4,15 +4,17 @@
 import sys
 import tensorflow as tf
 import time
-from SeqUnit import *
-from DataLoader import DataLoader
 import numpy as np
-from PythonROUGE import PythonROUGE
-from nltk.translate.bleu_score import corpus_bleu, SmoothingFunction
-from preprocess import *
-from util import * 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+from nltk.translate.bleu_score import corpus_bleu, SmoothingFunction
+
+from modules.SeqUnit import *
+from modules.DataLoader import DataLoader
+from utils.PythonROUGE import PythonROUGE
+from preprocess import *
+from utils.util import * 
+
 
 tf.app.flags.DEFINE_integer("hidden_size", 500, "Size of each layer.")
 tf.app.flags.DEFINE_integer("emb_size", 400, "Size of embedding.")
