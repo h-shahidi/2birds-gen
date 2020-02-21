@@ -150,7 +150,7 @@ def evaluate(sess, dataloader, model, ksave_dir, mode='valid'):
     gold_set = [[gold_path + str(i)] for i in range(k)]
     pred_set = [pred_path + str(i) for i in range(k)]
 
-    recall, precision, F_measure = 0,0,0 #PythonROUGE(pred_set, gold_set, ngram_order=4)
+    recall, precision, F_measure = PythonROUGE(pred_set, gold_set, ngram_order=4)
     bleu = corpus_bleu(gold_list, pred_list)
     copy_result = "with copy F_measure: %s Recall: %s Precision: %s BLEU: %s\n" % \
     (str(F_measure), str(recall), str(precision), str(bleu))
@@ -159,7 +159,7 @@ def evaluate(sess, dataloader, model, ksave_dir, mode='valid'):
         with open(pred_path + str(tk), 'w') as sw:
             sw.write(" ".join(pred_unk[tk]) + '\n')
 
-    recall, precision, F_measure = 0,0,0 #PythonROUGE(pred_set, gold_set, ngram_order=4)
+    recall, precision, F_measure = PythonROUGE(pred_set, gold_set, ngram_order=4)
     bleu = corpus_bleu(gold_list, pred_unk)
     nocopy_result = "without copy F_measure: %s Recall: %s Precision: %s BLEU: %s\n" % \
     (str(F_measure), str(recall), str(precision), str(bleu))
