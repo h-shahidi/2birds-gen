@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 from nltk.translate.bleu_score import corpus_bleu, SmoothingFunction
 
-from modules.SeqUnit import *
-from modules.DataLoader import DataLoader
+from modules.seq2seq import *
+from modules.data_loader import DataLoader
 from utils.PythonROUGE import PythonROUGE
 from preprocess import *
 from utils.util import * 

@@ -8,10 +8,10 @@ from nltk.translate.gleu_score import sentence_gleu
 from nltk.translate.bleu_score import SmoothingFunction, sentence_bleu
 cc = SmoothingFunction()
 
-from modules.AttentionUnit import AttentionWrapper
-from modules.LSTMUnit import LSTMUnit
-from modules.OutputUnit import OutputUnit
-from modules.CopyMechanism import copy_mech
+from modules.attention import AttentionWrapper
+from modules.lstm_unit import LSTMUnit
+from modules.output_unit import OutputUnit
+from modules.copy_mechanism import copy_mech
 import utils.rouge
 
 BETA = 0.017
