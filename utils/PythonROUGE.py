@@ -39,8 +39,8 @@ def PythonROUGE(guess_summ_list,ref_summ_list,ngram_order=2):
 #        del temp
     
     # this is the path to your ROUGE distribution
-    ROUGE_path = 'ROUGE/ROUGE-1.5.5.pl'
-    data_path = 'ROUGE/data'
+    ROUGE_path = 'utils/ROUGE/ROUGE-1.5.5.pl'
+    data_path = 'utils/ROUGE/data'
     
     # these are the options used to call ROUGE
     # feel free to edit this is you want to call ROUGE with different options
