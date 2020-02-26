@@ -21,7 +21,7 @@ python preprocess.py
 After preprocessing, `processed_data` would be created. This directory contains `*.box.pos`, `*.box.rpos`, `*.box.val`, and `*.box.lab` that represent the word position p+, p-, field content and field types, respectively.
 
 # Train
-Run the following command for traing:
+Run the following command for training:
 ```
 python main.py --mode=train
 ```
