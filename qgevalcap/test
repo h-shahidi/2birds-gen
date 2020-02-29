@@ -1,0 +1,1 @@
+python eval.py --tgt_file output_noEOS.ref --out_file output_noDup.pred
