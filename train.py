@@ -208,9 +208,9 @@ def main(_):
         for step in xrange(max_steps):
             cur_batch = train_data_loader.nextBatch()
             if FLAGS.mode == 'rl_train':
-                loss_value = train_graph.rl_train(sess, cur_batch)
+                loss_value = train_graph.rl_train(sess, cur_batch, with_ce=False)
             elif FLAGS.mode == 'rl_ce_train':
-                loss_value = train_graph.rl_ce_train(sess, cur_batch)
+                loss_value = train_graph.rl_train(sess, cur_batch, with_ce=True)
             elif FLAGS.mode == 'ce_train':
                 loss_value = train_graph.ce_train(sess, cur_batch)
             total_loss += loss_value

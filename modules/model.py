@@ -191,7 +191,7 @@ class ModelGraph(object):
         else:
             return sess.run([self.train_op, self.loss], feed_dict)[1]
 
-    def rl_train(self, sess, batch):
+    def rl_train(self, sess, batch, with_ce):
         feed_dict = self.run_encoder(sess, batch, only_feed_dict=True)
         feed_dict[self.decoder_inputs] = batch.decoder_inputs
 
@@ -216,78 +216,12 @@ class ModelGraph(object):
         for i, (baseline_output, greedy_output) in enumerate(zip(baseline_outputs, greedy_outputs)):
             _, baseline_output_words = self.word_vocab.getLexical(baseline_output)
             greedy_output, greedy_output_words = self.word_vocab.getLexical(greedy_output)
-            _, gold_ouput_words = self.word_vocab.getLexical(gold_output[i])
-
-            rl_inputs.append([int(batch.decoder_inputs[i,0])] + greedy_output[:-1])
-            rl_outputs.append(greedy_output)
-            rl_input_lengths.append(len(greedy_output))
-
-            baseline_output_words_list = baseline_output_words.split()
-            greedy_output_words_list = greedy_output_words.split()
-            gold_output_words_list = gold_ouput_words.split()
-
-            if self.flags.reward_type == 'bleu':
-                cc = SmoothingFunction()
-                reward = sentence_bleu([gold_output_words_list], greedy_output_words_list, smoothing_function=cc.method3)
-                baseline = sentence_bleu([gold_output_words_list], baseline_output_words_list, smoothing_function=cc.method3)
-                rewards.append(reward - baseline)
-
-            elif self.flags.reward_type == 'rouge':
-                reward = rouge.rouge([gold_ouput_words], [greedy_output_words])["rouge_l/f_score"]
-                baseline = rouge.rouge([gold_ouput_words], [baseline_output_words])["rouge_l/f_score"]
-                rewards.append(reward - baseline)
-
-            else:
-                raise ValueError("Reward type is not bleu or rouge!")
-
-        rl_inputs = padding_utils.pad_2d_vals(rl_inputs, len(rl_inputs), self.flags.max_question_len)
-        rl_outputs = padding_utils.pad_2d_vals(rl_outputs, len(rl_outputs), self.flags.max_question_len)
-        rl_input_lengths = np.array(rl_input_lengths, dtype=np.int32)
-        rewards = np.array(rewards, dtype=np.float32)
-        #reward = rescale(reward)
-        assert rl_inputs.shape == rl_outputs.shape
-
-        feed_dict = self.run_encoder(sess, batch, only_feed_dict=True)
-        feed_dict[self.rewards] = rewards
-        feed_dict[self.decoder_inputs] = rl_inputs
-        feed_dict[self.question_words] = rl_outputs
-        feed_dict[self.question_lengths] = rl_input_lengths
-
-        _, loss = sess.run([self.train_op, self.loss], feed_dict)
-        return loss
-
-    def rl_ce_train(self, sess, batch):
-        feed_dict = self.run_encoder(sess, batch, only_feed_dict=True)
-        feed_dict[self.decoder_inputs] = batch.decoder_inputs
-
-        # get greedy and gold outputs
-        greedy_output = sess.run(self.greedy_words, feed_dict)
-        greedy_output = greedy_output.tolist()
-        gold_output = batch.question_words.tolist()
-
-        # baseline outputs by flipping coin
-        flipp = 0.1
-        baseline_outputs = np.copy(batch.question_words)
-        for i in range(batch.question_words.shape[0]):
-            seq_len = min(self.flags.max_question_len, batch.question_lengths[i]-1) # don't change stop token '</s>'
-            for j in range(seq_len):
-                if greedy_output[i][j] != 0 and random.random() < flipp:
-                    baseline_outputs[i,j] = greedy_output[i][j]
-        baseline_outputs = baseline_outputs.tolist()
-
-        rl_inputs = []
-        rl_outputs = []
-        rl_input_lengths = []
-        rewards = []
-        for i, (baseline_output, greedy_output) in enumerate(zip(baseline_outputs, greedy_output)):
-            _, baseline_output_words = self.word_vocab.getLexical(baseline_output)
-            greedy_output, greedy_output_words = self.word_vocab.getLexical(greedy_output)
             _, gold_output_words = self.word_vocab.getLexical(gold_output[i])
 
             rl_inputs.append([int(batch.decoder_inputs[i,0])] + greedy_output[:-1])
             rl_outputs.append(greedy_output)
             rl_input_lengths.append(len(greedy_output))
-            
+
             baseline_output_words_list = baseline_output_words.split()
             greedy_output_words_list = greedy_output_words.split()
             gold_output_words_list = gold_output_words.split()
@@ -303,22 +237,31 @@ class ModelGraph(object):
                 baseline = rouge.rouge([gold_output_words], [baseline_output_words])["rouge_l/f_score"]
                 rewards.append(reward - baseline)
 
+            else:
+                raise ValueError("Reward type is not bleu or rouge!")
+
         rl_inputs = padding_utils.pad_2d_vals(rl_inputs, len(rl_inputs), self.flags.max_question_len)
         rl_outputs = padding_utils.pad_2d_vals(rl_outputs, len(rl_outputs), self.flags.max_question_len)
         rl_input_lengths = np.array(rl_input_lengths, dtype=np.int32)
         rewards = np.array(rewards, dtype=np.float32)
-#        reward = rescale(reward)
+        #reward = rescale(reward)
         assert rl_inputs.shape == rl_outputs.shape
 
         feed_dict = self.run_encoder(sess, batch, only_feed_dict=True)
         feed_dict[self.rewards] = rewards
-        feed_dict[self.decoder_inputs_rl] = rl_inputs
-        feed_dict[self.question_words_rl] = rl_outputs
-        feed_dict[self.question_lengths_rl] = rl_input_lengths
 
-        feed_dict[self.decoder_inputs] = batch.decoder_inputs
-        feed_dict[self.question_words] = batch.question_words
-        feed_dict[self.question_lengths] = batch.question_lengths
+        if with_ce:
+            feed_dict[self.decoder_inputs_rl] = rl_inputs
+            feed_dict[self.question_words_rl] = rl_outputs
+            feed_dict[self.question_lengths_rl] = rl_input_lengths
+            feed_dict[self.decoder_inputs] = batch.decoder_inputs
+            feed_dict[self.question_words] = batch.question_words
+            feed_dict[self.question_lengths] = batch.question_lengths
+            
+        else:
+            feed_dict[self.decoder_inputs] = rl_inputs
+            feed_dict[self.question_words] = rl_outputs
+            feed_dict[self.question_lengths] = rl_input_lengths
 
         _, loss = sess.run([self.train_op, self.loss], feed_dict)
         return loss
