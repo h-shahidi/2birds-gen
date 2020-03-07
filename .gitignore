@@ -1,5 +1,8 @@
 *.pyc
 data/stanford-corenlp-full-2018-10-05/
+data/split-1/*.json
+data/split-2/
+data/vectors.txt.st
 results/
 logs/
 .*/

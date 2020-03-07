@@ -1,6 +1,10 @@
 {
-    "train_path": "data/processed_train.json",
-    "dev_path": "data/processed_dev.json",
+    "s1_train_path": "data/split-1/processed_train.json",
+    "s1_dev_path": "data/split-1/processed_dev.json",
+    "s1_test_path": "data/split-1/processed_test.json",
+    "s2_train_path": "data/split-2/train",
+    "s2_dev_path": "data/split-2/dev",
+    "s2_test_path": "data/split-2/test",
     "word_vec_path": "data/vectors.txt.st",
     "model_dir": "logs",
     "isLower": true,
@@ -14,12 +18,12 @@
     "batch_size": 50,
     "learning_rate": 0.3,
     "lambda_l2": 0.0,
-    "dropout_rate": 0.1,
+    "dropout_rate": 0.3,
     "n_epochs": 25,
     "clip_value": 5,
     "encoder_layer_num": 2,
-    "encoder_hidden_size": 350,
-    "decoder_hidden_size": 350,
+    "encoder_hidden_size": 512,
+    "decoder_hidden_size": 512,
     "with_word": true,
     "with_POS": false,
     "with_NER": false,
@@ -29,6 +33,5 @@
     "fix_word_vec": true,
     "max_passage_len": 600,
     "mode": "ce_train",
-    "reward_type": "bleu",
-    "config_path": "config.json"
+    "reward_type": "bleu"
 }

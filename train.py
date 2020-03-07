@@ -14,19 +14,11 @@ cc = SmoothingFunction()
 
 from utils.vocab_utils import Vocab
 from utils import config_utils
-from modules.data import read_dataset, collect_vocabs, QGDataLoader
+from modules.data import read_data_split_1, read_data_split_2, collect_vocabs, QGDataLoader
 from modules.model import ModelGraph
 
 FLAGS = None
 tf.logging.set_verbosity(tf.logging.ERROR) # DEBUG, INFO, WARN, ERROR, and FATAL
-
-
-# File Paths
-vocab_file = "language_model/data/vocab-2016-09-10.txt"
-pbtxt      = "language_model/data/graph-2016-09-10.pbtxt"
-ckpt       = "language_model/data/ckpt-*"
-
-MAX_WORD_LEN = 50
 
 
 def document_bleu(vocab, gen, ref, suffix=''):
@@ -87,11 +79,17 @@ def main(_):
     config_utils.save_config(FLAGS, path_prefix + "config.json")
 
     print('Loading train set.')
-    train_set, train_question_len = read_dataset(FLAGS.train_path, isLower=FLAGS.isLower)
+    if FLAGS.data_split == 1:
+        train_set, train_question_len = read_data_split_1(FLAGS.s1_train_path, isLower=FLAGS.isLower)
+    else:
+        train_set, train_question_len = read_data_split_2(FLAGS.s2_train_path, isLower=FLAGS.isLower)
     print('Number of training samples: {}'.format(len(train_set)))
 
     print('Loading test set.')
-    dev_set, dev_question_len = read_dataset(FLAGS.dev_path, isLower=FLAGS.isLower)
+    if FLAGS.data_split == 1:
+        dev_set, dev_question_len = read_data_split_1(FLAGS.s1_dev_path, isLower=FLAGS.isLower)
+    else:
+        dev_set, dev_question_len = read_data_split_2(FLAGS.s2_dev_path, isLower=FLAGS.isLower)
     print('Number of test samples: {}'.format(len(dev_set)))
 
     max_actual_len = max(train_question_len, dev_question_len)
@@ -273,11 +271,12 @@ def main(_):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--config_path', type=str, help='Configuration file.')
+    parser.add_argument('--data_split', type=int, default=1)
 
     args = parser.parse_args()
 
     if args.config_path is not None:
         print('Loading the configuration from ' + args.config_path)
-        FLAGS = config_utils.load_config(args.config_path)
+        FLAGS = config_utils.load_config(args)
 
     tf.app.run(main=main)

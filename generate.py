@@ -10,7 +10,7 @@ import numpy as np
 import tensorflow as tf
 from nltk.corpus import stopwords
 
-from modules.data import read_dataset, QGDataLoader
+from modules.data import read_data_split_1, read_data_split_2, QGDataLoader
 from modules.model import ModelGraph
 from utils.vocab_utils import Vocab
 from utils import config_utils
@@ -196,13 +196,11 @@ def beam_search(sess, model, vocab, batch, flags):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_prefix', type=str, required=True, help='Prefix to the models.')
-    parser.add_argument('--in_path', type=str, required=True, help='The path to the test file.')
     parser.add_argument('--out_path', type=str, help='The path to the output file.')
 
     args = parser.parse_args()
 
     model_prefix = args.model_prefix
-    in_path = args.in_path
     out_path = args.out_path
 
     # load the configuration file
@@ -224,7 +222,10 @@ if __name__ == '__main__':
         print('NER_vocab: {}'.format(NER_vocab.vocab_size))
 
     print('Loading test set.')
-    testset, _ = read_dataset(in_path, isLower=FLAGS.isLower)
+    if FLAGS.data_split == 1:
+        testset, _ = read_data_split_1(FLAGS.s1_test_path, isLower=FLAGS.isLower)
+    else:
+        testset, _ = read_data_split_2(FLAGS.s2_test_path, isLower=FLAGS.isLower)
     print('Number of samples: {}'.format(len(testset)))
 
     batch_size = 1

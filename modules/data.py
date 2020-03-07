@@ -1,5 +1,6 @@
 import json
 import re
+import os
 import random
 
 import numpy as np
@@ -8,7 +9,7 @@ from utils import padding_utils
 from utils.sent_utils import Sentence
 
 
-def read_dataset(inpath, isLower=True):
+def read_data_split_1(inpath, isLower=True):
     with open(inpath) as dataset_file:
         dataset = json.load(dataset_file, encoding='utf-8')
     
@@ -17,23 +18,63 @@ def read_dataset(inpath, isLower=True):
     for instance in dataset:
         instance_id = instance['id']
 
-        passage_tokens = instance['annotation1']['toks_sent']
-        if passage_tokens == "": continue
+        passage_text = instance['annotation1']['toks_sent']
+        if passage_text == "": continue
         annotation1 = instance['annotation1']
         annotation1["POSs"] = annotation1["POS_sent"]
         annotation1["NERs"] = annotation1["NER_sent"]
-        passage = Sentence(passage_tokens, annotation1, ID_num=instance_id, isLower=False)
+        passage = Sentence(passage_text, annotation1, ID_num=instance_id, isLower=False)
         passage.answer_span = instance['IO_sent']
 
-        question_tokens = instance['annotation2']['toks']
-        if question_tokens == "": continue
+        question_text = instance['annotation2']['toks']
+        if question_text == "": continue
         annotation2 = instance['annotation2']
-        question = Sentence(question_tokens, annotation2, ID_num=instance_id, isLower=isLower, end_sym='</s>')
-        max_question_len = max(max_question_len, question.get_length()) # text2 is the sequence to be generated
+        question = Sentence(question_text, annotation2, ID_num=instance_id, isLower=isLower, end_sym='</s>')
+        max_question_len = max(max_question_len, question.get_length())
 
-        answer_tokens = instance['annotation3']['toks']
+        answer_text = instance['annotation3']['toks']
         annotation3 = instance['annotation3']
-        answer = Sentence(answer_tokens, annotation3, ID_num=instance_id, isLower=isLower)
+        answer = Sentence(answer_text, annotation3, ID_num=instance_id, isLower=isLower)
+
+        all_instances.append((passage, question, answer))
+
+    return all_instances, max_question_len
+
+
+def read_data_split_2(inpath, isLower=True):
+    all_instances = []
+    max_question_len = 0
+
+    sources = open(os.path.join(inpath, "source.txt"), "r")
+    targets = open(os.path.join(inpath, "target.txt"), "r")
+    bios = open(os.path.join(inpath, "bio.txt"), "r")
+    ner_tags = open(os.path.join(inpath, "ner.txt"), "r")
+    pos_tags = open(os.path.join(inpath, "pos.txt"), "r")
+
+    for source, target, bio, ner, pos in zip(sources, targets, bios, ner_tags, pos_tags):
+        instance_id = None
+
+        passage_text = source.strip()
+        if passage_text == "": continue
+        annotation1 = {}
+        annotation1["POSs"] = pos.strip()
+        annotation1["NERs"] = ner.strip()
+        passage = Sentence(passage_text, annotation1, ID_num=instance_id, isLower=False)
+        passage.answer_span = [0 if i == 'O' else 1 for i in bio.strip().split()]
+
+        question_text = target.strip()
+        if question_text == "": continue
+        annotation2 = None
+        question = Sentence(question_text, annotation2, ID_num=instance_id, isLower=isLower, end_sym='</s>')
+        max_question_len = max(max_question_len, question.get_length())
+
+        answer_text = []
+        for index, word in enumerate(source.strip().split()):
+            if passage.answer_span[index] == 1:
+                answer_text.append(word)
+        answer_text = " ".join(answer_text)
+        annotation3 = None
+        answer = Sentence(answer_text, annotation3, ID_num=instance_id, isLower=isLower)
 
         all_instances.append((passage, question, answer))
 
