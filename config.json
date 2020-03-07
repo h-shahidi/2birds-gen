@@ -1,3 +1,34 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:7b380dee4550b986f15c212f2fa511e40464a2e7dadfdda34acbc82fa9df3a0d
-size 878
+{
+    "train_path": "data/processed_train.json",
+    "dev_path": "data/processed_dev.json",
+    "word_vec_path": "data/vectors.txt.st",
+    "model_dir": "logs",
+    "isLower": true,
+    "pointer_gen": true,
+    "use_coverage": false,
+    "attention_vec_size": 350,
+    "coverage_loss_const": 0.0,
+    "beam_size": 20,
+    "min_question_len": 0,
+    "max_question_len": 50,
+    "batch_size": 50,
+    "learning_rate": 0.3,
+    "lambda_l2": 0.0,
+    "dropout_rate": 0.1,
+    "n_epochs": 25,
+    "clip_value": 5,
+    "encoder_layer_num": 2,
+    "encoder_hidden_size": 350,
+    "decoder_hidden_size": 350,
+    "with_word": true,
+    "with_POS": false,
+    "with_NER": false,
+    "with_answer_span": true,
+    "POS_dim": 20,
+    "NER_dim": 12,
+    "fix_word_vec": true,
+    "max_passage_len": 600,
+    "mode": "ce_train",
+    "reward_type": "bleu",
+    "config_path": "config.json"
+}
