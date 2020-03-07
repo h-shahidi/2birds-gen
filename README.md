@@ -9,9 +9,11 @@ This repository provides implementation for neural question generation, discusse
   - stanfordcorenlp
 
 # Data
-The [SQuAD1.1](https://rajpurkar.github.io/SQuAD-explorer/) dataset is used for training and evaluation. We provide our data through `git-lfs`. [This page](https://github.com/git-lfs/git-lfs/wiki/Installation) explains how to install it. You should be able to get the data in `data` directory using a regular git clone.
+The [SQuAD1.1](https://rajpurkar.github.io/SQuAD-explorer/) dataset is used for training and evaluation. Prior work has splitted the data into train, validation, and test sets in two different ways, which we will call split-1 and split-2, respectively. 
+We provide our data split-1 [here](https://drive.google.com/file/d/1Avd7EBY7652r09UeIxngn8yiPHbX9qB6/view?usp=sharing). Download and unzip it inside `data` directory or move to `Preprocess Data Split-1` section, if you'd like to prepare it yourself.
+We use the vocabulary and word embedding that is provided by [MPQG](https://github.com/freesunshine0316/MPQG).
 
-# Preprocess
+# Preprocess Data Split-1
 To prepare data split-1 yourself, download the data provided by [MPQG](https://github.com/freesunshine0316/MPQG) from [here](https://www.cs.rochester.edu/~lsong10/downloads/nqg_data.tgz) and unzip it inside `data` directory. Then, download the raw SQuAD dataset from [here](https://github.com/xinyadu/nqg/tree/master/data/raw) in the same directory. In addition, we would need [Stanford CoreNLP](http://nlp.stanford.edu/software/stanford-corenlp-full-2018-10-05.zip) for tokenization, POS tagging, etc. Eventually, run the following command in `data` directory:
 ```
 python preprocess.py
