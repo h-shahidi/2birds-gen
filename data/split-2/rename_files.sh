@@ -13,6 +13,6 @@ rename () {
     done;
 }
 
-rename data/split-2/train/train.txt. train.txt.
-rename data/split-2/dev/dev.txt.shuffle.dev. dev.txt.shuffle.dev.
-rename data/split-2/test/dev.txt.shuffle.test. dev.txt.shuffle.test.
+rename train/train.txt. train.txt.
+rename dev/dev.txt.shuffle.dev. dev.txt.shuffle.dev.
+rename test/dev.txt.shuffle.test. dev.txt.shuffle.test.

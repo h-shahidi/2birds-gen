@@ -15,7 +15,7 @@ We provide our data split-1 [here](https://drive.google.com/file/d/1Avd7EBY7652r
 
 For data split-2, download and unzip `QG` directory from [here](https://res.qyzhou.me/redistribute.zip) inside `data/split-2` directory. Then, run the following command:
 ```
-bash scripts/rename_data_split_2_files.sh
+bash rename_files.sh
 ```
 
 We use the vocabulary and word embedding that is provided by [MPQG](https://github.com/freesunshine0316/MPQG).
