@@ -68,6 +68,7 @@ class Hypothesis(object):
                             break
                     j += 1
             all_words.append(cur_word)
+        all_words = map(str, all_words)
         return " ".join(all_words[1:-1])
 
 
@@ -205,7 +206,8 @@ if __name__ == '__main__':
 
     # load the configuration file
     print('Loading configurations from ' + model_prefix + "config.json")
-    FLAGS = config_utils.load_config(model_prefix + "config.json")
+    args.config_path = model_prefix + "config.json"
+    FLAGS = config_utils.load_config(args)
 
     # load vocabs
     print('Loading vocabs.')
@@ -272,13 +274,13 @@ if __name__ == '__main__':
             cur_batch = test_data_loader.get_batch(i)
             print('Instance {}'.format(i))
             line = cur_batch.instances[0][1].tokText.replace(" </s>","")
-            ref_outfile.write(line.encode('utf-8') + "\n")
+            ref_outfile.write(line + "\n")
             ref_outfile.flush()
             hyps = beam_search(sess, valid_graph, word_vocab, cur_batch, FLAGS)
             cur_passage = cur_batch.instances[0][0]
             cur_sent = hyps[0].idx_seq_to_string(cur_passage, word_vocab)
             line = cur_sent.replace(" </s>","")
-            pred_outfile.write(line.encode('utf-8') + "\n")
+            pred_outfile.write(line + "\n")
             pred_outfile.flush()
 
         ref_outfile.close()

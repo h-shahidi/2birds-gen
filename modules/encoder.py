@@ -68,9 +68,9 @@ class Encoder(object):
 
         passage_representations = tf.concat(passage_representations, 2) # [batch_size, passage_len, dim]
 
-        if is_training:
+        if self.flags.data_split == 1 and is_training:
             passage_representations = tf.nn.dropout(passage_representations, (1 - self.flags.dropout_rate))
-        else:
+        elif self.flags.data_split == 1:
             passage_representations = tf.multiply(passage_representations, (1 - self.flags.dropout_rate))
 
         passage_len = tf.shape(self.passage_words)[1]
