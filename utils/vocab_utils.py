@@ -9,7 +9,7 @@ class Vocab(object):
         self.t = TweetTokenizer()
         self.unk_label = '<unk>'
         if embedding_path != None:
-            self.fromText(embedding_path, voc=vocab, pre_word_vecs=word_vecs)
+            self.fromText(embedding_path, vocab=vocab, pre_word_vecs=word_vecs)
         else: # build a vocabulary with a word set
             self.fromVocabualry(vocab, dim=dim)
 
@@ -39,7 +39,7 @@ class Vocab(object):
         scale = 0.05
         self.word_vecs = np.array(np.random.uniform(low=-scale, high=scale, size=shape), dtype=np.float32)
 
-    def fromText(self, vec_path,voc=None,pre_word_vecs=None):
+    def fromText(self, vec_path, vocab=None, pre_word_vecs=None):
         # load freq table and build index for each word
         self.word2id = {}
         self.id2word = {}
@@ -108,7 +108,6 @@ class Vocab(object):
         sentence = sentence.strip()
         seq = []
         for i, word in enumerate(re.split('\\s+', sentence)):
-#        for word in sentence:
             idx = self.getIndex(word)
             if idx == None and self.__unk_mapping is not None and self.__unk_mapping.has_key(word):
                 simWord = self.__unk_mapping[word]

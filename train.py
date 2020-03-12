@@ -109,10 +109,10 @@ def main(_):
             word_vocab = Vocab(embedding_path=FLAGS.word_vec_path)
             print('word_vocab: {}'.format(word_vocab.word_vecs.shape))
         if FLAGS.with_POS:
-            POS_vocab = Vocab(embedding_path=path_prefix + "POS_vocab")
+            POS_vocab = Vocab(embedding_path=os.path.join(path_prefix, "POS_vocab"))
             print('POS_vocab: {}'.format(POS_vocab.word_vecs.shape))
         if FLAGS.with_NER:
-            NER_vocab = Vocab(embedding_path=path_prefix + "NER_vocab")
+            NER_vocab = Vocab(embedding_path=os.path.join(path_prefix, "NER_vocab"))
             print('NER_vocab: {}'.format(NER_vocab.word_vecs.shape))
 
     else:
@@ -126,10 +126,10 @@ def main(_):
             word_vocab = Vocab(embedding_path=FLAGS.word_vec_path)
         if FLAGS.with_POS:
             POS_vocab = Vocab(vocab=allPOSs, dim=FLAGS.POS_dim)
-            POS_vocab.dump_to_txt(path_prefix + "POS_vocab")
+            POS_vocab.dump_to_txt(os.path.join(path_prefix, "POS_vocab"))
         if FLAGS.with_NER:
             NER_vocab = Vocab(vocab=allNERs, dim=FLAGS.NER_dim)
-            NER_vocab.dump_to_txt(path_prefix + "NER_vocab")
+            NER_vocab.dump_to_txt(os.path.join(path_prefix, "NER_vocab"))
         
     print('word vocab size {}'.format(word_vocab.vocab_size))
     sys.stdout.flush()

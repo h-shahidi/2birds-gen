@@ -51,17 +51,18 @@ class Hypothesis(object):
     def idx_seq_to_string(self, passage, vocab):
         all_words = []
         for i, idx in enumerate(self.tokens):
-            if idx < vocab.vocab_size:
-                cur_word = vocab.getWord(idx)
-            elif  idx == vocab.vocab_size:
+            cur_word = vocab.getWord(idx)
+            if  idx == vocab.vocab_size:
                 j = 0
-                while j < len(re.split('\\s+', passage.tokText)):
-                    if passage.answer_span[np.argmax(self.attn_dist[i])] == 1:
-                        self.attn_dist[i][np.argmax(self.attn_dist[i])] = -np.inf
+                passage_tokens = re.split('\\s+', passage.tokText)
+                while j < len(passage_tokens):
+                    max_index = np.argmax(self.attn_dist[i])
+                    if passage.answer_span[max_index] == 1:
+                        self.attn_dist[i][max_index] = -np.inf
                     else:
-                        candidate_word = re.split('\\s+', passage.tokText)[np.argmax(self.attn_dist[i])]
+                        candidate_word = passage_tokens[max_index]
                         if candidate_word in stopwords.words('english'):
-                            self.attn_dist[i][np.argmax(self.attn_dist[i])] = -np.inf
+                            self.attn_dist[i][max_index] = -np.inf
                         else:
                             cur_word = candidate_word
                             break
@@ -213,14 +214,14 @@ if __name__ == '__main__':
     word_vocab = POS_vocab = NER_vocab = None
     if FLAGS.with_word:
         word_vocab = Vocab(embedding_path=FLAGS.word_vec_path)
-        print('word_vocab: {}'.format(word_vocab.word_vecs.shape))
+        print('word_vocab: {}'.format(word_vocab.vocab_size))
     if FLAGS.with_POS:
-        POS_vocab = Vocab(embedding_path=model_prefix + ".POS_vocab")
-        print('POS_vocab: {}'.format(POS_vocab.word_vecs.shape))
+        POS_vocab = Vocab(embedding_path=os.path.join(model_prefix, "POS_vocab"))
+        print('POS_vocab: {}'.format(POS_vocab.vocab_size))
     if FLAGS.with_NER:
-        NER_vocab = Vocab(embedding_path=model_prefix + ".NER_vocab")
+        NER_vocab = Vocab(embedding_path=os.path.join(model_prefix, "NER_vocab"))
         NER_vocab.word_vecs = NER_vocab.word_vecs[:-1,:]
-        print('NER_vocab: {}'.format(NER_vocab.word_vecs.shape))
+        print('NER_vocab: {}'.format(NER_vocab.vocab_size))
 
     print('Loading test set.')
     testset, _ = read_dataset(in_path, isLower=FLAGS.isLower)
