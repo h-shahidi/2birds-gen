@@ -10,7 +10,7 @@
     "isLower": true,
     "pointer_gen": true,
     "use_coverage": false,
-    "attention_vec_size": 350,
+    "attention_vec_size": 512,
     "coverage_loss_const": 0.0,
     "beam_size": 20,
     "min_question_len": 0,

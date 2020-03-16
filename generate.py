@@ -68,7 +68,8 @@ class Hypothesis(object):
                             break
                     j += 1
             all_words.append(cur_word)
-        all_words = map(str, all_words)
+        if not all(isinstance(word, unicode) for word in all_words):
+            all_words = map(str, all_words)
         return " ".join(all_words[1:-1])
 
 
@@ -274,12 +275,16 @@ if __name__ == '__main__':
             cur_batch = test_data_loader.get_batch(i)
             print('Instance {}'.format(i))
             line = cur_batch.instances[0][1].tokText.replace(" </s>","")
+            if isinstance(line, unicode):
+                line = line.encode('utf-8')
             ref_outfile.write(line + "\n")
             ref_outfile.flush()
             hyps = beam_search(sess, valid_graph, word_vocab, cur_batch, FLAGS)
             cur_passage = cur_batch.instances[0][0]
             cur_sent = hyps[0].idx_seq_to_string(cur_passage, word_vocab)
             line = cur_sent.replace(" </s>","")
+            if isinstance(line, unicode):
+                line = line.encode('utf-8')
             pred_outfile.write(line + "\n")
             pred_outfile.flush()
 
