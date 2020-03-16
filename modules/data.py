@@ -69,7 +69,7 @@ def read_data_split_2(inpath, isLower=True):
         max_question_len = max(max_question_len, question.get_length())
 
         answer_text = []
-        for index, word in enumerate(source.strip().split()):
+        for index, word in enumerate(passage.words):
             if passage.answer_span[index] == 1:
                 answer_text.append(word)
         answer_text = " ".join(answer_text)
