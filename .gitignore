@@ -1,0 +1,4 @@
+*.pyc
+original_data/
+processed_data/
+results/
